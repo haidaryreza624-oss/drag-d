@@ -1,49 +1,53 @@
-// types.js (just a reference, we don't export types, only factory functions & validators)
+// src/core/types.js
 
 /**
- * Node shapes:
- * {
- *   id: string,
- *   type: 'element' | 'attribute' | 'style',
- *   position: { x: number, y: number },
- *   // ... type-specific fields
- * }
+ * Factory for an HTML element node
  */
-
-// Factory functions ensure consistent shapes
 export function createElementNode(id, tag, textContent = '', position = { x: 0, y: 0 }) {
   return {
     id,
     type: 'element',
     tag,
     textContent,
-    position
+    position,
   };
 }
 
+/**
+ * Factory for an attribute node
+ */
 export function createAttributeNode(id, name, value, valueType = 'string', position = { x: 0, y: 0 }) {
-  // For boolean attributes, value can be true/false
   return {
     id,
     type: 'attribute',
     name,
     value,
     valueType,   // 'string' | 'boolean' | 'enum'
-    position
+    position,
   };
 }
 
+/**
+ * Factory for a style block node
+ */
 export function createStyleBlockNode(id, declarations = {}, alias = '', position = { x: 0, y: 0 }) {
   return {
     id,
     type: 'style',
     declarations,
     alias,
-    position
+    position,
   };
 }
 
-// Edge shape: { id, source, target, relation }
+/**
+ * Factory for a connection edge
+ */
 export function createEdge(id, source, target, relation) {
-  return { id, source, target, relation }; // relation: 'hasAttribute' | 'usesStyle'
+  return {
+    id,
+    source,
+    target,
+    relation,   // 'hasAttribute' or 'usesStyle'
+  };
 }

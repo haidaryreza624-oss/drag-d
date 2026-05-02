@@ -1,30 +1,26 @@
-// validators.js
+// src/core/validators.js
+
 import { ATTRIBUTE_DB } from './attributeDB.js';
 
-/**
- * Returns true if an attribute can be applied on the given tag.
- * Custom data-* attributes are always allowed.
- */
-export function isAttributeValidForElement(attributeName, tag) {
-  const def = ATTRIBUTE_DB.find(d => d.name === attributeName);
-  if (!def) return true; // likely a data-* attribute
+export function isAttributeValidForElement(attrName, tag) {
+  const def = ATTRIBUTE_DB.find(d => d.name === attrName);
+  if (!def) return true; // custom data-* etc.
   if (def.appliesTo.includes('*')) return true;
   return def.appliesTo.includes(tag);
 }
 
-/**
- * Given a tag and optional filter string, return a list of valid attribute names.
- */
-export function getValidAttributesForElement(tag, filterText = '') {
-  const all = ATTRIBUTE_DB.filter(def => def.appliesTo.includes('*') || def.appliesTo.includes(tag));
-  return all
-    .filter(def => def.name.includes(filterText))
-    .map(def => def.name);
+export function getAttributeDef(attrName) {
+  return ATTRIBUTE_DB.find(d => d.name === attrName) || null;
 }
 
-/**
- * Get the value definition (type/values) for an attribute.
- */
-export function getAttributeDef(name) {
-  return ATTRIBUTE_DB.find(d => d.name === name) || null;
+// ADD THIS FUNCTION:
+export function getValidAttributesForElement(tag, filterText = '') {
+  const filtered = ATTRIBUTE_DB.filter(
+    def => def.appliesTo.includes('*') || def.appliesTo.includes(tag)
+  );
+  let names = filtered.map(def => def.name);
+  if (filterText) {
+    names = names.filter(n => n.includes(filterText));
+  }
+  return names;
 }

@@ -10,8 +10,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "nanoid": "^5.1.11",
     "react": "^19.2.5",
-    "react-dom": "^19.2.5"
+    "react-dom": "^19.2.5",
+    "reactflow": "^11.11.4",
+    "zustand": "^5.0.12"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

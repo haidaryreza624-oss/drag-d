@@ -1,86 +1,86 @@
-// codegen.js
+// src/core/codegen.js
 
 /**
- * Generates HTML + CSS from the graph.
- * Returns { html: string, css: string }
+ * Generates HTML and CSS from the graph.
+ * @param {object} graph - { nodes: Record<string, object>, edges: Array }
+ * @returns {{ html: string, css: string }}
  */
 export function generateCode(graph) {
-  const styleRules = [];
-  const usedClassNames = new Map(); // style node id -> class name
+  // Step 1: Assign class names to style blocks that are actually used
+  const styleClassMap = new Map(); // styleNodeId -> className
 
-  // 1. Assign class names to style blocks that are connected
-  graph.edges
-    .filter(e => e.relation === 'usesStyle')
-    .forEach(e => {
-      const styleNode = graph.nodes[e.source];
-      if (styleNode && styleNode.type === 'style') {
-        if (!usedClassNames.has(styleNode.id)) {
-          const className = styleNode.alias || `gs-${styleNode.id.slice(0, 8)}`;
-          usedClassNames.set(styleNode.id, className);
-          const decls = Object.entries(styleNode.declarations)
-            .map(([prop, val]) => `${prop}: ${val};`)
-            .join(' ');
-          styleRules.push(`.${className} { ${decls} }`);
-        }
+  for (const edge of graph.edges) {
+    if (edge.relation === 'usesStyle') {
+      const styleNode = graph.nodes[edge.source];
+      if (styleNode && styleNode.type === 'style' && !styleClassMap.has(edge.source)) {
+        const className = styleNode.alias || `gs-${edge.source.slice(0, 8)}`;
+        styleClassMap.set(edge.source, className);
       }
-    });
+    }
+  }
 
-  // 2. Build each element's HTML
-  const elements = Object.values(graph.nodes).filter(n => n.type === 'element');
+  // Step 2: Build CSS string
+  let css = '';
+  for (const [styleId, className] of styleClassMap.entries()) {
+    const styleNode = graph.nodes[styleId];
+    const declarations = Object.entries(styleNode.declarations)
+      .map(([prop, val]) => `  ${prop}: ${val};`)
+      .join('\n');
+    css += `.${className} {\n${declarations}\n}\n\n`;
+  }
 
+  // Step 3: Build HTML for each element node
+  const elementNodes = Object.values(graph.nodes).filter(n => n.type === 'element');
   let html = '';
-  elements.forEach(el => {
-    // collect connected attributes
-    const attrs = [];
-    graph.edges
-      .filter(e => e.relation === 'hasAttribute' && e.target === el.id)
-      .forEach(e => {
-        const attrNode = graph.nodes[e.source];
-        if (!attrNode || attrNode.type !== 'attribute') return;
 
-        if (attrNode.name === 'class') {
-          // collect class values from all attributes + style classes
-          // (handled later)
-        } else if (attrNode.valueType === 'boolean') {
-          if (attrNode.value) attrs.push(attrNode.name);
-        } else {
-          attrs.push(`${attrNode.name}="${attrNode.value}"`);
+  for (const elem of elementNodes) {
+    // Collect all attribute nodes connected to this element
+    const attrEdges = graph.edges.filter(
+      e => e.relation === 'hasAttribute' && e.target === elem.id
+    );
+
+    // Build attribute list
+    const attrParts = [];
+    const classNames = [];
+
+    for (const edge of attrEdges) {
+      const attrNode = graph.nodes[edge.source];
+      if (!attrNode || attrNode.type !== 'attribute') continue;
+
+      if (attrNode.name === 'class' && typeof attrNode.value === 'string') {
+        // Collect class names from attribute node
+        classNames.push(...attrNode.value.split(/\s+/).filter(Boolean));
+      } else if (attrNode.valueType === 'boolean') {
+        // Boolean attribute: include only if true
+        if (attrNode.value) {
+          attrParts.push(attrNode.name);
         }
-      });
-
-    // Collect classes from attributes and style blocks
-    let classes = [];
-    // From attribute nodes of type 'class'
-    graph.edges
-      .filter(e => e.relation === 'hasAttribute' && e.target === el.id)
-      .forEach(e => {
-        const attrNode = graph.nodes[e.source];
-        if (attrNode && attrNode.type === 'attribute' && attrNode.name === 'class') {
-          if (typeof attrNode.value === 'string') {
-            classes.push(...attrNode.value.split(/\s+/).filter(Boolean));
-          }
-        }
-      });
-
-    // From style blocks
-    graph.edges
-      .filter(e => e.relation === 'usesStyle' && e.target === el.id)
-      .forEach(e => {
-        const className = usedClassNames.get(e.source);
-        if (className) classes.push(className);
-      });
-
-    if (classes.length > 0) {
-      attrs.push(`class="${classes.join(' ')}"`);
+      } else {
+        // Regular attribute (string/enum)
+        attrParts.push(`${attrNode.name}="${attrNode.value}"`);
+      }
     }
 
-    const attrString = attrs.length > 0 ? ' ' + attrs.join(' ') : '';
-    const text = el.textContent || '';
-    html += `<${el.tag}${attrString}>${text}</${el.tag}>\n`;
-  });
+    // Add class names from connected style blocks
+    const styleEdges = graph.edges.filter(
+      e => e.relation === 'usesStyle' && e.target === elem.id
+    );
+    for (const edge of styleEdges) {
+      const className = styleClassMap.get(edge.source);
+      if (className) classNames.push(className);
+    }
+
+    if (classNames.length > 0) {
+      attrParts.push(`class="${classNames.join(' ')}"`);
+    }
+
+    const attrString = attrParts.length > 0 ? ' ' + attrParts.join(' ') : '';
+    const text = elem.textContent || '';
+    html += `<${elem.tag}${attrString}>${text}</${elem.tag}>\n`;
+  }
 
   return {
     html: html.trim(),
-    css: styleRules.join('\n')
+    css: css.trim(),
   };
 }
