@@ -1,16 +1,50 @@
-# React + Vite
+# GraphUI – Visual Graph‑Based HTML/CSS Builder
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Build web interfaces by connecting nodes on a canvas.  
+Drag elements, attach attributes and styles, nest children, and export clean HTML/CSS.  
+No coding required – just drag, connect, and design.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Features
 
-## React Compiler
+- Three node types: HTML Elements, Attributes, Style Blocks
+- Many‑to‑many connections: reuse one attribute or style across multiple elements
+- Parent‑child nesting: drag edges to build DOM tree structures
+- Live preview: see your page update in real time
+- Smart attribute picker: modal filtered per tag, with recommended attributes starred
+- Tag‑aware inspector: quick fields for src, href, type, etc., auto‑creation of attribute nodes
+- CSS autocomplete: property name suggestions for style blocks
+- Save as reusable components: persist subgraphs, insert them as single widget nodes
+- Undo (Ctrl+Z) – experiment safely
+- Export to a single .html file with embedded CSS
+- Keyboard shortcuts: Delete, Ctrl+C/V for copy‑paste
+- Dark mode toggle (persists across reloads)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+## Tech Stack
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+| Layer          | Technology                          |
+|----------------|-------------------------------------|
+| Canvas         | React Flow (reactflow)              |
+| State          | Zustand                             |
+| UI             | React (JavaScript)                  |
+| Code generation| Pure functions (custom engine)      |
+| Persistence    | localStorage for components & theme |
+| Build          | Vite                                |
+
+---
+
+## Getting Started
+
+### Prerequisites
+- Node.js 18 or higher
+- npm or yarn
+
+### Installation
+
+```bash
+git clone https://github.com/yourusername/graphui.git
+cd graphui
+npm install
