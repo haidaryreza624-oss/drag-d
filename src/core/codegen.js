@@ -1,14 +1,10 @@
 // src/core/codegen.js
 
-/**
- * Generates HTML and CSS from the graph.
- * @param {object} graph - { nodes: Record<string, object>, edges: Array }
- * @returns {{ html: string, css: string }}
- */
 export function generateCode(graph) {
-  // Step 1: Assign class names to style blocks that are actually used
-  const styleClassMap = new Map(); // styleNodeId -> className
+  console.log('Codegen graph:', graph);
 
+  // 1. Style blocks → class map
+  const styleClassMap = new Map();
   for (const edge of graph.edges) {
     if (edge.relation === 'usesStyle') {
       const styleNode = graph.nodes[edge.source];
@@ -19,7 +15,6 @@ export function generateCode(graph) {
     }
   }
 
-  // Step 2: Build CSS string
   let css = '';
   for (const [styleId, className] of styleClassMap.entries()) {
     const styleNode = graph.nodes[styleId];
@@ -29,42 +24,48 @@ export function generateCode(graph) {
     css += `.${className} {\n${declarations}\n}\n\n`;
   }
 
-  // Step 3: Build HTML for each element node
-  const elementNodes = Object.values(graph.nodes).filter(n => n.type === 'element');
-  let html = '';
+  // 2. Build parent/child relationships
+  const allElements = Object.values(graph.nodes).filter(n => n.type === 'element');
+  const childrenOf = new Map();
+  const parentOf = new Map();
 
-  for (const elem of elementNodes) {
-    // Collect all attribute nodes connected to this element
-    const attrEdges = graph.edges.filter(
-      e => e.relation === 'hasAttribute' && e.target === elem.id
-    );
+  for (const edge of graph.edges) {
+    if (edge.relation === 'child') {
+      if (!childrenOf.has(edge.source)) childrenOf.set(edge.source, []);
+      childrenOf.get(edge.source).push(edge.target);
+      parentOf.set(edge.target, edge.source);
+    }
+  }
 
-    // Build attribute list
+  const roots = allElements.filter(el => !parentOf.has(el.id));
+  console.log('Roots:', roots.map(r => r.tag + '#' + r.id));
+
+  // 3. Recursive render
+  function renderElement(nodeId) {
+    const elem = graph.nodes[nodeId];
+    if (!elem || elem.type !== 'element') {
+      console.warn('Missing or wrong type for node:', nodeId);
+      return '';
+    }
+
+    const attrEdges = graph.edges.filter(e => e.relation === 'hasAttribute' && e.target === nodeId);
     const attrParts = [];
     const classNames = [];
 
     for (const edge of attrEdges) {
       const attrNode = graph.nodes[edge.source];
       if (!attrNode || attrNode.type !== 'attribute') continue;
-
       if (attrNode.name === 'class' && typeof attrNode.value === 'string') {
-        // Collect class names from attribute node
         classNames.push(...attrNode.value.split(/\s+/).filter(Boolean));
       } else if (attrNode.valueType === 'boolean') {
-        // Boolean attribute: include only if true
-        if (attrNode.value) {
-          attrParts.push(attrNode.name);
-        }
+        if (attrNode.value) attrParts.push(attrNode.name);
       } else {
-        // Regular attribute (string/enum)
         attrParts.push(`${attrNode.name}="${attrNode.value}"`);
       }
     }
 
-    // Add class names from connected style blocks
-    const styleEdges = graph.edges.filter(
-      e => e.relation === 'usesStyle' && e.target === elem.id
-    );
+    // Style classes
+    const styleEdges = graph.edges.filter(e => e.relation === 'usesStyle' && e.target === nodeId);
     for (const edge of styleEdges) {
       const className = styleClassMap.get(edge.source);
       if (className) classNames.push(className);
@@ -75,12 +76,19 @@ export function generateCode(graph) {
     }
 
     const attrString = attrParts.length > 0 ? ' ' + attrParts.join(' ') : '';
+    const children = (childrenOf.get(nodeId) || []).map(childId => renderElement(childId)).join('\n');
     const text = elem.textContent || '';
-    html += `<${elem.tag}${attrString}>${text}</${elem.tag}>\n`;
+    const inner = text + (children ? '\n' + children + '\n' : '');
+
+    return `<${elem.tag}${attrString}>${inner.trim()}</${elem.tag}>`;
   }
 
-  return {
-    html: html.trim(),
-    css: css.trim(),
-  };
+  let html = '';
+  if (roots.length === 0) {
+    html = allElements.map(el => renderElement(el.id)).join('\n').trim();
+  } else {
+    html = roots.map(el => renderElement(el.id)).join('\n').trim();
+  }
+
+  return { html, css: css.trim() };
 }

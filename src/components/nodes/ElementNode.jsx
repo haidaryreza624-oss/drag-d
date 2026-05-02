@@ -1,3 +1,4 @@
+// src/components/nodes/ElementNode.jsx
 import { Handle, Position } from 'reactflow';
 import useUIStore from '../../store/uiStore';
 
@@ -14,21 +15,18 @@ export default function ElementNode({ data }) {
       minWidth: 100,
       textAlign: 'center',
     }}>
+      {/* Target handle – receives attributes, styles, and child connections */}
       <Handle type="target" position={Position.Top} id="target" />
 
       <div style={{ fontWeight: 'bold' }}>&lt;{data.tag}&gt;</div>
       {data.textContent && <div style={{ fontSize: 12 }}>{data.textContent}</div>}
 
-      {/* + button to add attribute */}
+      {/* + button for adding attributes */}
       <button
-          onClick={(e) => {
-    e.stopPropagation();
-    alert('Button clicked!');
-    // call the function
-    useUIStore.getState().openAttributeModal(data.id);
-    // then log the new state
-    console.log('After openModal, show =', useUIStore.getState().showAttributeModal);
-  }}
+        onClick={(e) => {
+          e.stopPropagation();
+          openModal(data.id);
+        }}
         style={{
           position: 'absolute',
           top: -10,
@@ -43,10 +41,12 @@ export default function ElementNode({ data }) {
           lineHeight: '20px',
           textAlign: 'center',
           padding: 0,
+          zIndex: 10,
         }}
         title="Add Attribute"
       >+</button>
-  
+
+      {/* Source handle – used for creating child elements */}
       <Handle type="source" position={Position.Bottom} id="source" />
     </div>
   );

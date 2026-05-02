@@ -7,12 +7,16 @@ export default function Preview() {
   const graph = useGraphStore((s) => s.graph);
 
   const { html, css } = useMemo(() => {
-    try {
-      return generateCode(graph);
-    } catch (err) {
-      return { html: '', css: `/* Error: ${err.message} */` };
-    }
-  }, [graph]);
+  try {
+    const result = generateCode(graph);
+    console.log('Preview HTML:', result.html);
+    console.log('Preview CSS:', result.css);
+    return result;
+  } catch (err) {
+    console.error('Code generation error:', err);
+    return { html: '', css: '' };
+  }
+}, [graph]);
 
   const fullDoc = `
     <!DOCTYPE html>

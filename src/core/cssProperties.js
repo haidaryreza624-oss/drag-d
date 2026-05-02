@@ -1,0 +1,20 @@
+// src/core/cssProperties.js
+export const CSS_PROPERTIES = [
+  'align-content', 'align-items', 'align-self', 'animation', 'appearance',
+  'backface-visibility', 'background', 'background-color', 'background-image',
+  'border', 'border-radius', 'border-color', 'border-style', 'border-width',
+  'bottom', 'box-shadow', 'box-sizing', 'caption-side', 'clear', 'clip',
+  'color', 'column-count', 'column-gap', 'content', 'cursor', 'direction',
+  'display', 'empty-cells', 'filter', 'flex', 'flex-direction', 'flex-wrap',
+  'float', 'font', 'font-family', 'font-size', 'font-style', 'font-weight',
+  'gap', 'grid', 'grid-template-columns', 'grid-template-rows', 'height',
+  'justify-content', 'left', 'letter-spacing', 'line-height', 'list-style',
+  'margin', 'margin-bottom', 'margin-left', 'margin-right', 'margin-top',
+  'max-height', 'max-width', 'min-height', 'min-width', 'opacity', 'order',
+  'outline', 'overflow', 'overflow-x', 'overflow-y', 'padding',
+  'padding-bottom', 'padding-left', 'padding-right', 'padding-top',
+  'position', 'resize', 'right', 'row-gap', 'text-align', 'text-decoration',
+  'text-indent', 'text-overflow', 'text-transform', 'top', 'transform',
+  'transition', 'visibility', 'white-space', 'width', 'word-break',
+  'word-spacing', 'z-index',
+];
