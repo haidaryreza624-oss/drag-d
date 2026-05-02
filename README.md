@@ -1,4 +1,4 @@
-# GraphUI – Visual Graph‑Based HTML/CSS Builder
+# drag_html – Visual Graph‑Based HTML/CSS Builder
 
 Build web interfaces by connecting nodes on a canvas.  
 Drag elements, attach attributes and styles, nest children, and export clean HTML/CSS.  
@@ -107,7 +107,7 @@ Ctrl+Z – undo
 
 ### Project Structure
 ```text
-graphui/
+drag_html/
 ├── src/
 │   ├── core/                 # Pure logic (no React)
 │   │   ├── types.js              Node factories
