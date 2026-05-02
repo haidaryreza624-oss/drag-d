@@ -45,8 +45,8 @@ No coding required – just drag, connect, and design.
 ### Installation
 
 ```bash
-git clone https://github.com/yourusername/graphui.git
-cd graphui
+git clone https://github.com/haidaryreza624-oss/drag-d.git
+cd drag-d
 npm install
 ```
 
