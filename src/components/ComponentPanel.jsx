@@ -2,25 +2,21 @@
 import React from 'react';
 import useComponentStore from '../store/componentStore';
 import useGraphStore from '../store/graphStore';
-
+import { nanoid } from 'nanoid';
 export default function ComponentPanel() {
   const components = useComponentStore((s) => s.components);
   const instantiateComponent = useComponentStore((s) => s.instantiateComponent);
   const deleteComponent = useComponentStore((s) => s.deleteComponent);
-
+const addComponentNode = useGraphStore((s) => s.addComponentNode);
   const handleAdd = (compId) => {
-    const result = instantiateComponent(compId);
-    if (result) {
-      const graphStore = useGraphStore.getState();
-      graphStore._pushHistory();
-      const currentGraph = graphStore.graph;
-      const updatedNodes = { ...currentGraph.nodes, ...result.nodes };
-      const updatedEdges = [...currentGraph.edges, ...result.edges];
-      useGraphStore.setState({
-        graph: { nodes: updatedNodes, edges: updatedEdges },
-      });
-    }
-  };
+  const comp = components.find(c => c.id === compId);
+  if (!comp) return;
+  const id = nanoid();
+  addComponentNode(id, compId, comp.name, {
+    x: 100 + Math.random() * 300,
+    y: 100 + Math.random() * 300,
+  });
+};
 
   return (
     <div style={{

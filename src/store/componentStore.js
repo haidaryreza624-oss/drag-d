@@ -37,7 +37,15 @@ const useComponentStore = create((set, get) => ({
     set({ components: updated });
     persist(updated);
   },
-
+    instantiateComponentAsNode: (componentId) => {
+    const component = get().components.find(c => c.id === componentId);
+    if (!component) return null;
+    // We just return the component info; the caller will create a node
+    return {
+        componentId: component.id,
+        name: component.name,
+    };
+    },
   // Instantiate: returns new nodes/edges with fresh IDs and position offset
   instantiateComponent: (componentId) => {
     const component = get().components.find(c => c.id === componentId);

@@ -8,7 +8,7 @@ import {
 } from '../core/types.js';
 import { canAddEdge } from '../core/graphOperations.js';
 import { generateCode } from '../core/codegen.js';
-
+import { createComponentNode } from '../core/types.js';
 const useGraphStore = create((set, get) => ({
   graph: {
     nodes: {},
@@ -45,7 +45,16 @@ const useGraphStore = create((set, get) => ({
   });
 },
 
-
+addComponentNode: (id, componentId, name, position) => {
+  get()._pushHistory();
+  const node = createComponentNode(id, componentId, name, position);
+  set((state) => ({
+    graph: {
+      ...state.graph,
+      nodes: { ...state.graph.nodes, [id]: node },
+    },
+  }));
+},
 
   // ---- Node actions ----
   addElementNode: (id, tag, textContent = '', position = { x: 0, y: 0 }) => {

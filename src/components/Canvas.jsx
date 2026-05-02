@@ -7,11 +7,12 @@ import useUIStore from '../store/uiStore';
 import ElementNode from './nodes/ElementNode';
 import AttributeNode from './nodes/AttributeNode';
 import StyleNode from './nodes/StyleNode';
-
+import ComponentNode from './nodes/ComponentNode';
 const nodeTypes = {
   element: ElementNode,
   attribute: AttributeNode,
   style: StyleNode,
+  component: ComponentNode,
 };
 
 export default function Canvas() {

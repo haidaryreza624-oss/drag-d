@@ -3,6 +3,16 @@
 /**
  * Factory for an HTML element node
  */
+
+export function createComponentNode(id, componentId, name, position = { x: 0, y: 0 }) {
+  return {
+    id,
+    type: 'component',
+    componentId,
+    name,      // display name
+    position,
+  };
+}
 export function createElementNode(id, tag, textContent = '', position = { x: 0, y: 0 }) {
   return {
     id,

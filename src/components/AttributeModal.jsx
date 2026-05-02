@@ -1,10 +1,11 @@
 // src/components/AttributeModal.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import useUIStore from '../store/uiStore';
 import useGraphStore from '../store/graphStore';
 import { getValidAttributesForElement, getAttributeDef } from '../core/validators';
 import { ATTRIBUTE_DB } from '../core/attributeDB';
 import { nanoid } from 'nanoid';
+import { RECOMMENDED_ATTRIBUTES } from '../core/recommendedAttributes';
 
 export default function AttributeModal() {
   const show = useUIStore((s) => s.showAttributeModal);
@@ -27,6 +28,7 @@ export default function AttributeModal() {
   const targetElement = targetElementId ? graph.nodes[targetElementId] : null;
   const tag = targetElement ? targetElement.tag : null;
 
+  // Get raw available attribute names
   useEffect(() => {
     if (tag) {
       const attrs = getValidAttributesForElement(tag, filterText);
@@ -37,6 +39,24 @@ export default function AttributeModal() {
       setAvailableNames(names);
     }
   }, [tag, filterText]);
+
+  // Determine which attributes are recommended (for stars and sorting)
+  const recommendedSet = useMemo(() => {
+    if (!tag) return new Set();
+    const recommendedList = RECOMMENDED_ATTRIBUTES[tag]?.map(a => a.name) || [];
+    const globalRec = RECOMMENDED_ATTRIBUTES._global?.map(a => a.name) || [];
+    return new Set([...recommendedList, ...globalRec]);
+  }, [tag]);
+
+  // Sort: recommended first, then alphabetically
+  const sortedNames = useMemo(() => {
+    return [...availableNames].sort((a, b) => {
+      const aRec = recommendedSet.has(a) ? 0 : 1;
+      const bRec = recommendedSet.has(b) ? 0 : 1;
+      if (aRec !== bRec) return aRec - bRec;
+      return a.localeCompare(b);
+    });
+  }, [availableNames, recommendedSet]);
 
   const selectName = (name) => {
     setAttrName(name);
@@ -66,7 +86,7 @@ export default function AttributeModal() {
     closeModal();
   };
 
-  if (!show) return null;     // ← restored guard
+  if (!show) return null;
 
   return (
     <div style={{
@@ -84,12 +104,20 @@ export default function AttributeModal() {
             style={{ width: '100%', marginBottom: 8 }}
           />
           <ul style={{ maxHeight: 200, overflow: 'auto', listStyle: 'none', padding: 0 }}>
-            {availableNames.map((name) => (
+            {sortedNames.map((name) => (
               <li
                 key={name}
                 onClick={() => selectName(name)}
-                style={{ cursor: 'pointer', padding: '4px 8px', borderBottom: '1px solid #eee' }}
+                style={{
+                  cursor: 'pointer',
+                  padding: '4px 8px',
+                  borderBottom: '1px solid #eee',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 4,
+                }}
               >
+                {recommendedSet.has(name) && <span style={{ color: 'gold' }}>⭐</span>}
                 {name}
               </li>
             ))}
