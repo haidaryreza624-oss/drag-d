@@ -16,10 +16,9 @@ No coding required – just drag, connect, and design.
 - Tag‑aware inspector: quick fields for src, href, type, etc., auto‑creation of attribute nodes
 - CSS autocomplete: property name suggestions for style blocks
 - Save as reusable components: persist subgraphs, insert them as single widget nodes
-- Undo (Ctrl+Z) – experiment safely
+- Undo  – experiment safely
 - Export to a single .html file with embedded CSS
 - Keyboard shortcuts: Delete, Ctrl+C/V for copy‑paste
-- Dark mode toggle (persists across reloads)
 
 ---
 
@@ -31,7 +30,7 @@ No coding required – just drag, connect, and design.
 | State          | Zustand                             |
 | UI             | React (JavaScript)                  |
 | Code generation| Pure functions (custom engine)      |
-| Persistence    | localStorage for components & theme |
+| Persistence    | localStorage for components  |
 | Build          | Vite                                |
 
 ---
@@ -103,7 +102,6 @@ Ctrl+C – copy selected element + its connected attributes/styles
 
 Ctrl+V – paste a duplicate
 
-Ctrl+Z – undo
 
 ### Project Structure
 ```text
