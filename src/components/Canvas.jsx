@@ -70,11 +70,17 @@ useEffect(() => {
       data: { ...node },
     }));
   }, [graph.nodes]);
-const onNodeDragStop = useCallback((event, node) => {
-  updateNode(node.id, {
-    position: { x: node.position.x, y: node.position.y },
+
+const onNodesChange = useCallback((changes) => {
+  // React Flow will call this for every position change during a drag.
+  changes.forEach(change => {
+    if (change.type === 'position' && change.position) {
+      updateNode(change.id, { position: change.position });
+    }
   });
 }, [updateNode]);
+
+
   // Convert store edges → React Flow format (with handle IDs)
 const edges = useMemo(() => {
   return graph.edges.map((edge) => ({
@@ -132,7 +138,7 @@ const onConnect = useCallback((params) => {
   onPaneClick={() => deselectNode()}
   onNodesDelete={onNodesDelete}
   onEdgesDelete={onEdgesDelete}
-  onNodeDragStop={onNodeDragStop}   // ← this line
+  onNodesChange ={onNodesChange }   // ← this line
   deleteKeyCode={['Backspace', 'Delete']}
   fitView
 >

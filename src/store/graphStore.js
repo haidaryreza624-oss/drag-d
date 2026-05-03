@@ -1,4 +1,4 @@
-// src/store/graphStore.js
+
 import { create } from 'zustand';
 import {
   createElementNode,
@@ -17,7 +17,7 @@ const useGraphStore = create((set, get) => ({
   history: [],
   historyIndex: -1,
 
-  // ---- History helpers ----
+  
   _pushHistory: () => {
     const { graph, history, historyIndex } = get();
     const newHistory = history.slice(0, historyIndex + 1);
